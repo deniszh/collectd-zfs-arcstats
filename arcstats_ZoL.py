@@ -1,7 +1,7 @@
-import collectd
+#!/usr/bin/python
 
 from decimal import Decimal
-
+import sys
 
 class ARCstats(object):
 
@@ -63,8 +63,19 @@ class ARCstats(object):
         for n, v in kstat.items():
             self.dispatch_value('zfs', 'counter', n, v)
 
+if __name__ == '__main__':
+    arc = ARCstats()
+    kstat = arc.fetch_info()
 
-arc = ARCstats()
-# register callbacks
-collectd.register_config(arc.configure_callback)
-collectd.register_read(arc.read_callback)
+    for n, v in kstat.items():
+        print("%s.%s.%s:%s" % ('zfs', 'counter', n, v))
+
+    sys.exit(0)
+else:
+    import collectd
+
+    arc = ARCstats()
+
+    # register callbacks
+    collectd.register_config(arc.configure_callback)
+    collectd.register_read(arc.read_callback)
